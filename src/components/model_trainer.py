@@ -459,7 +459,7 @@ class ModelTrainer:
 
             # ── 1. Prophet baseline ───────────────────────────────────────
             logger.info("Running Prophet baseline ...")
-            prophet_metrics = self._run_prophet_baseline()
+            self._run_prophet_baseline()
 
             # ── 2. XGBoost ────────────────────────────────────────────────
             logger.info("Tuning XGBoost ...")
