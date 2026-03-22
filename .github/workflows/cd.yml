@@ -1,0 +1,96 @@
+# =============================================================================
+# .github/workflows/cd.yml
+# Continuous Delivery — triggers on merge to main
+#
+# Jobs:
+#   build-push  — build Docker image and push to GitHub Container Registry
+#   deploy-info — print deployment instructions for Cloud Run (Phase 11)
+#
+# Required secrets (set in GitHub repo Settings > Secrets):
+#   GHCR_TOKEN  — GitHub Personal Access Token with write:packages scope
+#                 (or use GITHUB_TOKEN which is automatic)
+# =============================================================================
+
+name: CD
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:        # allow manual trigger from GitHub UI
+
+env:
+  PYTHON_VERSION: "3.10"
+  REGISTRY:       ghcr.io
+  IMAGE_NAME:     ${{ github.repository_owner }}/gcp-billing-forecaster
+
+jobs:
+
+  # ── Job 1: Build and push Docker image to GHCR ─────────────────────────────
+  build-push:
+    name: Build & push to GHCR
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=sha-
+            type=ref,event=branch
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags:      ${{ steps.meta.outputs.tags }}
+          labels:    ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to:   type=gha,mode=max
+
+      - name: Image digest
+        run: echo "Image pushed with digest ${{ steps.build-push.outputs.digest }}"
+
+  # ── Job 2: Deployment info ──────────────────────────────────────────────────
+  deploy-info:
+    name: Deployment info
+    runs-on: ubuntu-latest
+    needs: build-push
+
+    steps:
+      - name: Print Cloud Run deploy command
+        run: |
+          echo "============================================"
+          echo "Docker image pushed to GHCR successfully."
+          echo ""
+          echo "To deploy to Cloud Run (Phase 11 — Terraform):"
+          echo ""
+          echo "  gcloud run deploy gcp-billing-forecaster \\"
+          echo "    --image ghcr.io/${{ github.repository_owner }}/gcp-billing-forecaster:latest \\"
+          echo "    --platform managed \\"
+          echo "    --region us-central1 \\"
+          echo "    --allow-unauthenticated \\"
+          echo "    --port 5000"
+          echo ""
+          echo "Or run: terraform apply  (from terraform/ directory)"
+          echo "============================================"
