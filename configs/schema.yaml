@@ -1,0 +1,130 @@
+# =============================================================================
+# schema.yaml
+# Single source of truth for the GCP billing dataset contract.
+# DataValidation reads this file — any column rename or type change in the
+# raw CSV must be reflected here first.
+# =============================================================================
+
+# ── Column definitions ────────────────────────────────────────────────────────
+columns:
+  Resource ID:
+    dtype: object
+    nullable: false
+
+  Service Name:
+    dtype: object
+    nullable: false
+
+  Usage Quantity:
+    dtype: float64
+    nullable: false
+    min: 0.0
+
+  Usage Unit:
+    dtype: object
+    nullable: false
+
+  Region/Zone:
+    dtype: object
+    nullable: false
+
+  CPU Utilization (%):
+    dtype: float64
+    nullable: true        # can be missing for some service types
+    min: 0.0
+    max: 100.0
+
+  Memory Utilization (%):
+    dtype: float64
+    nullable: true
+    min: 0.0
+    max: 100.0
+
+  Network Inbound Data (Bytes):
+    dtype: float64
+    nullable: true
+    min: 0.0
+
+  Network Outbound Data (Bytes):
+    dtype: float64
+    nullable: true
+    min: 0.0
+
+  Usage Start Date:
+    dtype: datetime64
+    nullable: false
+
+  Usage End Date:
+    dtype: datetime64
+    nullable: true
+
+  Cost per Quantity ($):
+    dtype: float64
+    nullable: false
+    min: 0.0
+
+  Unrounded Cost ($):
+    dtype: float64
+    nullable: false
+    min: 0.0
+
+  Rounded Cost ($):
+    dtype: int64
+    nullable: false
+    min: 0
+
+  Total Cost (INR):
+    dtype: int64
+    nullable: false
+    min: 0
+
+# ── Allowed categorical values ────────────────────────────────────────────────
+# These are validated against the ingestion_report.json on first run,
+# then hardcoded here so future runs catch any new/renamed service.
+
+allowed_values:
+  Service Name:
+    - App Engine
+    - Artifact Registry
+    - BigQuery
+    - Cloud Armor
+    - Cloud Build
+    - Cloud CDN
+    - Cloud Dataflow
+    - Cloud Dataproc
+    - Cloud Filestore
+    - Cloud Functions
+    - Cloud Logging
+    - Cloud Memorystore
+    - Cloud Monitoring
+    - Cloud Pub/Sub
+    - Cloud Run
+    - Cloud Scheduler
+    - Cloud Spanner
+    - Cloud SQL
+    - Cloud Storage
+    - Cloud Tasks
+    - Compute Engine
+    - Dialogflow
+    - Secret Manager
+
+  Usage Unit:
+    - GB
+    - Hours
+    - Requests
+
+  Region/Zone:
+    - asia-east1
+    - asia-south1
+    - europe-west1
+    - us-central1
+    - us-east1
+    - us-west1
+
+# ── Dataset-level rules ───────────────────────────────────────────────────────
+dataset_rules:
+  min_rows: 80                 # fail if dataset is suspiciously small (real CSV has 124k rows)
+  max_null_pct: 10.0            # fail if any column exceeds 10 % nulls
+  temporal_order: true          # Usage Start Date must precede Usage End Date
+  no_negative_cost: true        # Unrounded Cost ($) >= 0 always
+  train_test_date_no_overlap: true  # latest train date <= earliest test date
