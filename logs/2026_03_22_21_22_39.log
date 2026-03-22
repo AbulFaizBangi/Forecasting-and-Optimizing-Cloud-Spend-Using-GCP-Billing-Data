@@ -1,0 +1,30 @@
+[2026-03-22 21:22:39,308] 357 gcp_billing_mlops - INFO - ══════════════════════════════════════════════════
+[2026-03-22 21:22:39,308] 358 gcp_billing_mlops - INFO -   DATA INGESTION — started
+[2026-03-22 21:22:39,308] 359 gcp_billing_mlops - INFO - ══════════════════════════════════════════════════
+[2026-03-22 21:22:39,308] 97 gcp_billing_mlops - INFO - Artifacts directory ensured: artifacts
+[2026-03-22 21:22:39,314] 115 gcp_billing_mlops - INFO - CSV loaded — shape: (1000, 15), path: Dataset/cloud_billing_data.csv
+[2026-03-22 21:22:39,316] 135 gcp_billing_mlops - INFO - Column validation passed — all 15 expected columns present.
+[2026-03-22 21:22:39,320] 150 gcp_billing_mlops - WARNING - Column 'Usage Start Date': 575 rows could not be parsed as datetime and were set to NaT.
+[2026-03-22 21:22:39,322] 150 gcp_billing_mlops - WARNING - Column 'Usage End Date': 641 rows could not be parsed as datetime and were set to NaT.
+[2026-03-22 21:22:39,323] 161 gcp_billing_mlops - WARNING - Dropped 575 rows with NaT in 'Usage Start Date'.
+[2026-03-22 21:22:39,323] 165 gcp_billing_mlops - INFO - Datetime parsing complete.
+[2026-03-22 21:22:39,324] 180 gcp_billing_mlops - INFO - Data sorted chronologically by 'Usage Start Date'. Date range: 2024-01-07 00:13:00 → 2024-12-08 23:35:00
+[2026-03-22 21:22:39,324] 192 gcp_billing_mlops - INFO - ── Dataset summary ──────────────────────────────
+[2026-03-22 21:22:39,324] 193 gcp_billing_mlops - INFO -   Total rows     : 425
+[2026-03-22 21:22:39,324] 194 gcp_billing_mlops - INFO -   Total columns  : 15
+[2026-03-22 21:22:39,325] 195 gcp_billing_mlops - INFO -   Memory usage   : 0.15 MB
+[2026-03-22 21:22:39,326] 196 gcp_billing_mlops - INFO -   Services       : 25 unique
+[2026-03-22 21:22:39,326] 197 gcp_billing_mlops - INFO -   Regions        : 12 unique
+[2026-03-22 21:22:39,326] 198 gcp_billing_mlops - INFO -   Date range     : 2024-01-07 00:13:00 → 2024-12-08 23:35:00
+[2026-03-22 21:22:39,327] 200 gcp_billing_mlops - INFO -   Null counts    :
+Usage End Date    132
+dtype: int64
+[2026-03-22 21:22:39,327] 201 gcp_billing_mlops - INFO -   Total Cost (INR) — min: 1,162  max: 733,139  mean: 184,936
+[2026-03-22 21:22:39,327] 206 gcp_billing_mlops - INFO - ─────────────────────────────────────────────────
+[2026-03-22 21:22:39,331] 235 gcp_billing_mlops - INFO - Chronological split complete — train: 340 rows (2024-01-07 00:13:00 → 2024-10-08 05:23:00), test: 85 rows (2024-10-08 05:42:00 → 2024-12-08 23:35:00)
+[2026-03-22 21:22:39,337] 270 gcp_billing_mlops - INFO - Saved raw data  → artifacts/raw.csv
+[2026-03-22 21:22:39,337] 271 gcp_billing_mlops - INFO - Saved train data → artifacts/train.csv
+[2026-03-22 21:22:39,337] 272 gcp_billing_mlops - INFO - Saved test data  → artifacts/test.csv
+[2026-03-22 21:22:39,338] 324 gcp_billing_mlops - INFO - Ingestion report saved → artifacts/ingestion_report.json
+[2026-03-22 21:22:39,338] 392 gcp_billing_mlops - INFO -   DATA INGESTION — completed successfully
+[2026-03-22 21:22:39,339] 393 gcp_billing_mlops - INFO - ══════════════════════════════════════════════════

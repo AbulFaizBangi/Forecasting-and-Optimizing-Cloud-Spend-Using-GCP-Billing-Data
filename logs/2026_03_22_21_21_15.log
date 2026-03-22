@@ -1,0 +1,7 @@
+[2026-03-22 21:21:15,982] 357 gcp_billing_mlops - INFO - ══════════════════════════════════════════════════
+[2026-03-22 21:21:15,982] 358 gcp_billing_mlops - INFO -   DATA INGESTION — started
+[2026-03-22 21:21:15,982] 359 gcp_billing_mlops - INFO - ══════════════════════════════════════════════════
+[2026-03-22 21:21:15,982] 97 gcp_billing_mlops - INFO - Artifacts directory ensured: artifacts
+[2026-03-22 21:21:15,987] 115 gcp_billing_mlops - INFO - CSV loaded — shape: (1000, 15), path: Dataset/cloud_billing_data.csv
+[2026-03-22 21:21:15,989] 398 gcp_billing_mlops - ERROR - Data ingestion failed: Error occurred in script: [/Users/abulfaiz/Documents/GitHub/GCP-Cloud-Billing-Data/Forecasting-and-Optimizing-Cloud-Spend-Using-GCP-Billing-Data/src/components/data_ingestion.py] at line [131] with message: [Missing columns in dataset: ['Region / Zone']
+Found columns: ['Resource ID', 'Service Name', 'Usage Quantity', 'Usage Unit', 'Region/Zone', 'CPU Utilization (%)', 'Memory Utilization (%)', 'Network Inbound Data (Bytes)', 'Network Outbound Data (Bytes)', 'Usage Start Date', 'Usage End Date', 'Cost per Quantity ($)', 'Unrounded Cost ($)', 'Rounded Cost ($)', 'Total Cost (INR)']]

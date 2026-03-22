@@ -9,7 +9,7 @@ Responsibilities
   5. Return file paths to the next pipeline stage
 
 Column reference (from the Kaggle dataset)
-  Resource ID | Service Name | Usage Quantity | Usage Unit | Region / Zone
+  Resource ID | Service Name | Usage Quantity | Usage Unit | Region/Zone
   CPU Utilization (%) | Memory Utilization (%) | Network Inbound Data (Bytes)
   Network Outbound Data (Bytes) | Usage Start Date | Usage End Date
   Cost per Quantity ($) | Unrounded Cost ($) | Rounded Cost ($) | Total Cost (INR)
@@ -60,7 +60,7 @@ class DataIngestionConfig:
         "Service Name",
         "Usage Quantity",
         "Usage Unit",
-        "Region / Zone",
+        "Region/Zone",
         "CPU Utilization (%)",
         "Memory Utilization (%)",
         "Network Inbound Data (Bytes)",
@@ -194,7 +194,7 @@ class DataIngestion:
             logger.info(f"  Total columns  : {len(df.columns)}")
             logger.info(f"  Memory usage   : {df.memory_usage(deep=True).sum() / 1e6:.2f} MB")
             logger.info(f"  Services       : {df['Service Name'].nunique()} unique")
-            logger.info(f"  Regions        : {df['Region / Zone'].nunique()} unique")
+            logger.info(f"  Regions        : {df['Region/Zone'].nunique()} unique")
             logger.info(f"  Date range     : {df[self.config.sort_column].min()} → "
                         f"{df[self.config.sort_column].max()}")
             logger.info(f"  Null counts    :\n{df.isnull().sum()[df.isnull().sum() > 0]}")
@@ -307,9 +307,9 @@ class DataIngestion:
                 },
                 "null_counts": df.isnull().sum().to_dict(),
                 "unique_services": int(df["Service Name"].nunique()),
-                "unique_regions": int(df["Region / Zone"].nunique()),
+                "unique_regions": int(df["Region/Zone"].nunique()),
                 "service_names": sorted(df["Service Name"].unique().tolist()),
-                "region_names": sorted(df["Region / Zone"].unique().tolist()),
+                "region_names": sorted(df["Region/Zone"].unique().tolist()),
                 "target_stats": {
                     "min": float(df["Total Cost (INR)"].min()),
                     "max": float(df["Total Cost (INR)"].max()),
