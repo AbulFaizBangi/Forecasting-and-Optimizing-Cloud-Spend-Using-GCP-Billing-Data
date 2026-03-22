@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Forecast Result — GCP Billing</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f5f7fa;
+      color: #1a1a2e;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .header h1 { font-size: 1.8rem; font-weight: 600; }
+    .header p  { font-size: 0.9rem; color: #6b7280; margin-top: 0.4rem; }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      padding: 2rem;
+      width: 100%;
+      max-width: 680px;
+    }
+
+    /* ── Result hero ── */
+    .result-hero {
+      text-align: center;
+      padding: 1.5rem 0 1rem;
+    }
+    .result-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #9ca3af;
+      margin-bottom: 0.5rem;
+    }
+    .result-inr {
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: #1d4ed8;
+      letter-spacing: -0.02em;
+    }
+    .result-usd {
+      font-size: 1rem;
+      color: #6b7280;
+      margin-top: 0.3rem;
+    }
+    .result-badge {
+      display: inline-block;
+      background: #ecfdf5;
+      color: #065f46;
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      margin-top: 0.75rem;
+    }
+
+    hr { border: none; border-top: 1px solid #f3f4f6; margin: 1.5rem 0; }
+
+    /* ── Detail grid ── */
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+    .detail-item {
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+    }
+    .detail-key {
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.25rem;
+    }
+    .detail-val {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #111827;
+    }
+
+    /* ── Model info strip ── */
+    .model-strip {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 1.25rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid #f3f4f6;
+    }
+    .model-chip {
+      font-size: 0.75rem;
+      color: #6b7280;
+      background: #f3f4f6;
+      padding: 0.25rem 0.65rem;
+      border-radius: 6px;
+    }
+    .model-chip strong { color: #374151; }
+
+    /* ── Buttons ── */
+    .btn-row {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1.75rem;
+    }
+    .btn {
+      flex: 1;
+      height: 42px;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+    }
+    .btn:active { transform: scale(0.99); }
+    .btn-primary   { background: #2563eb; color: #fff; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-secondary { background: #f3f4f6; color: #374151; }
+    .btn-secondary:hover { background: #e5e7eb; }
+
+    .footer {
+      margin-top: 2rem;
+      font-size: 0.75rem;
+      color: #9ca3af;
+      text-align: center;
+    }
+
+    @media (max-width: 480px) {
+      .detail-grid { grid-template-columns: 1fr; }
+      .btn-row     { flex-direction: column; }
+      .result-inr  { font-size: 2.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>GCP Billing Cost Forecaster</h1>
+    <p>Predicted cost for your GCP resource usage</p>
+  </div>
+
+  <div class="card">
+
+    <!-- ── Result hero ── -->
+    <div class="result-hero">
+      <div class="result-label">Predicted Total Cost</div>
+      <div class="result-inr">₹{{ prediction_inr }}</div>
+      <div class="result-usd">≈ ${{ prediction_usd }} USD</div>
+      <span class="result-badge">LightGBM · MAPE 11.67% · R² 0.983</span>
+    </div>
+
+    <hr />
+
+    <!-- ── Input summary ── -->
+    <div class="result-label" style="margin-bottom:0.75rem;">Input Summary</div>
+    <div class="detail-grid">
+      <div class="detail-item">
+        <div class="detail-key">Service</div>
+        <div class="detail-val">{{ service_name }}</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-key">Region</div>
+        <div class="detail-val">{{ region_zone }}</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-key">Usage</div>
+        <div class="detail-val">{{ usage_quantity }} {{ usage_unit }}</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-key">Prediction latency</div>
+        <div class="detail-val">{{ latency_ms }} ms</div>
+      </div>
+    </div>
+
+    <!-- ── Model info strip ── -->
+    <div class="model-strip">
+      <span class="model-chip"><strong>Model:</strong> LightGBM</span>
+      <span class="model-chip"><strong>MAPE:</strong> 11.67%</span>
+      <span class="model-chip"><strong>R²:</strong> 0.9832</span>
+      <span class="model-chip"><strong>Features:</strong> 21</span>
+      <span class="model-chip"><strong>Tracking:</strong> MLflow</span>
+    </div>
+
+    <!-- ── Action buttons ── -->
+    <div class="btn-row">
+      <a href="/" class="btn btn-primary">← New Prediction</a>
+      <a href="/health" class="btn btn-secondary">Health Check</a>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    GCP Billing Forecaster &nbsp;|&nbsp;
+    <a href="/metrics" style="color:#9ca3af;">metrics</a> &nbsp;·&nbsp;
+    <a href="/health"  style="color:#9ca3af;">health</a>
+  </div>
+
+</body>
+</html>

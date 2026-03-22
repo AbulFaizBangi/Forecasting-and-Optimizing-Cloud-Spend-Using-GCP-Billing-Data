@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GCP Billing Cost Forecaster</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f5f7fa;
+      color: #1a1a2e;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .header h1 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: #1a1a2e;
+    }
+    .header p {
+      font-size: 0.9rem;
+      color: #6b7280;
+      margin-top: 0.4rem;
+    }
+    .badge {
+      display: inline-block;
+      background: #e0f2fe;
+      color: #0369a1;
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 0.2rem 0.7rem;
+      border-radius: 999px;
+      margin-top: 0.5rem;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      padding: 2rem;
+      width: 100%;
+      max-width: 680px;
+    }
+
+    .error-banner {
+      background: #fef2f2;
+      border: 1px solid #fca5a5;
+      color: #b91c1c;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.875rem;
+    }
+
+    .section-title {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #9ca3af;
+      margin-bottom: 0.75rem;
+      margin-top: 1.5rem;
+    }
+    .section-title:first-child { margin-top: 0; }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1rem;
+    }
+    .full { grid-column: 1 / -1; }
+
+    .field { display: flex; flex-direction: column; gap: 0.3rem; }
+    label {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #374151;
+    }
+    input, select {
+      height: 38px;
+      padding: 0 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 7px;
+      font-size: 0.875rem;
+      color: #111827;
+      background: #fff;
+      transition: border-color 0.15s;
+      width: 100%;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+    }
+    .hint {
+      font-size: 0.72rem;
+      color: #9ca3af;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #f3f4f6;
+      margin: 1.5rem 0;
+    }
+
+    .submit-btn {
+      width: 100%;
+      height: 44px;
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      margin-top: 1.5rem;
+    }
+    .submit-btn:hover  { background: #1d4ed8; }
+    .submit-btn:active { transform: scale(0.99); }
+
+    .footer {
+      margin-top: 2rem;
+      font-size: 0.75rem;
+      color: #9ca3af;
+      text-align: center;
+    }
+
+    @media (max-width: 520px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>GCP Billing Cost Forecaster</h1>
+    <p>Predict cloud spend using an MLOps pipeline — LightGBM · MLflow · MAPE 11.67%</p>
+    <span class="badge">MLOps Portfolio Project</span>
+  </div>
+
+  <div class="card">
+
+    {% if error %}
+    <div class="error-banner">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST" action="/predict">
+
+      <div class="section-title">Service Details</div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="service_name">GCP Service</label>
+          <select id="service_name" name="service_name" required>
+            {% for svc in services %}
+            <option value="{{ svc }}" {% if form_data and form_data.get('service_name') == svc %}selected{% endif %}>
+              {{ svc }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field">
+          <label for="region_zone">Region / Zone</label>
+          <select id="region_zone" name="region_zone" required>
+            {% for reg in regions %}
+            <option value="{{ reg }}" {% if form_data and form_data.get('region_zone') == reg %}selected{% endif %}>
+              {{ reg }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top:1.25rem;">Usage</div>
+      <div class="grid-3">
+        <div class="field" style="grid-column: span 2;">
+          <label for="usage_quantity">Usage Quantity</label>
+          <input type="number" id="usage_quantity" name="usage_quantity"
+                 step="0.0001" min="0" placeholder="e.g. 500"
+                 value="{{ form_data.get('usage_quantity', '') if form_data else '' }}" required />
+        </div>
+        <div class="field">
+          <label for="usage_unit">Unit</label>
+          <select id="usage_unit" name="usage_unit" required>
+            {% for unit in units %}
+            <option value="{{ unit }}" {% if form_data and form_data.get('usage_unit') == unit %}selected{% endif %}>
+              {{ unit }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-top:1rem;">
+        <div class="field">
+          <label for="cost_per_quantity">Cost per Unit ($)</label>
+          <input type="number" id="cost_per_quantity" name="cost_per_quantity"
+                 step="0.0001" min="0" placeholder="e.g. 4.50"
+                 value="{{ form_data.get('cost_per_quantity', '') if form_data else '' }}" required />
+        </div>
+        <div class="field"></div>
+      </div>
+
+      <div class="section-title" style="margin-top:1.25rem;">Resource Utilization</div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="cpu_utilization">CPU Utilization (%)</label>
+          <input type="number" id="cpu_utilization" name="cpu_utilization"
+                 step="0.01" min="0" max="100" placeholder="0 – 100"
+                 value="{{ form_data.get('cpu_utilization', '') if form_data else '' }}" />
+          <span class="hint">Leave blank if not applicable</span>
+        </div>
+        <div class="field">
+          <label for="memory_utilization">Memory Utilization (%)</label>
+          <input type="number" id="memory_utilization" name="memory_utilization"
+                 step="0.01" min="0" max="100" placeholder="0 – 100"
+                 value="{{ form_data.get('memory_utilization', '') if form_data else '' }}" />
+          <span class="hint">Leave blank if not applicable</span>
+        </div>
+        <div class="field">
+          <label for="network_inbound_bytes">Network Inbound (Bytes)</label>
+          <input type="number" id="network_inbound_bytes" name="network_inbound_bytes"
+                 step="1" min="0" placeholder="e.g. 500000000"
+                 value="{{ form_data.get('network_inbound_bytes', '') if form_data else '' }}" />
+        </div>
+        <div class="field">
+          <label for="network_outbound_bytes">Network Outbound (Bytes)</label>
+          <input type="number" id="network_outbound_bytes" name="network_outbound_bytes"
+                 step="1" min="0" placeholder="e.g. 500000000"
+                 value="{{ form_data.get('network_outbound_bytes', '') if form_data else '' }}" />
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top:1.25rem;">Billing Period</div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="usage_start_date">Usage Start Date</label>
+          <input type="datetime-local" id="usage_start_date" name="usage_start_date"
+                 value="{{ form_data.get('usage_start_date', '') if form_data else '' }}" required />
+        </div>
+        <div class="field">
+          <label for="usage_end_date">Usage End Date</label>
+          <input type="datetime-local" id="usage_end_date" name="usage_end_date"
+                 value="{{ form_data.get('usage_end_date', '') if form_data else '' }}" />
+          <span class="hint">Optional</span>
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn">Forecast Cost →</button>
+
+    </form>
+  </div>
+
+  <div class="footer">
+    Built with Flask · LightGBM · MLflow · scikit-learn &nbsp;|&nbsp;
+    <a href="/health" style="color:#6b7280;">health</a> &nbsp;·&nbsp;
+    <a href="/metrics" style="color:#6b7280;">metrics</a>
+  </div>
+
+</body>
+</html>
