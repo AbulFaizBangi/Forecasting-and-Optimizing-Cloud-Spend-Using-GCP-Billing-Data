@@ -1,0 +1,9 @@
+# # 1. Install ipykernel inside your active venv
+# pip install ipykernel
+
+# # 2. Register the kernel
+# # --name is the internal ID, --display-name is what you see in the UI
+# python -m ipykernel install --user --name=gcp-billing-venv --display-name "Python (GCP-Billing)"
+
+# # 3. Verify the installation
+# jupyter kernelspec list
