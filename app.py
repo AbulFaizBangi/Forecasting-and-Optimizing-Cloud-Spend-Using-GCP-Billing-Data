@@ -32,6 +32,8 @@ app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "gcp-billing-mlops-dev")
 # ── Load pipeline once at startup ─────────────────────────────────────────────
 
 pipeline = PredictPipeline()
+pipeline._load()  # force eager load at startup
+
 
 # ── Metrics counters ──────────────────────────────────────────────────────────
 

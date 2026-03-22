@@ -1,0 +1,72 @@
+# =============================================================================
+# docker-compose.yml
+# Runs the full local stack:
+#   app     — Flask prediction server  (localhost:5000)
+#   mlflow  — MLflow tracking UI       (localhost:5001)
+#
+# Usage:
+#   docker compose up --build      # first run
+#   docker compose up              # subsequent runs
+#   docker compose down            # stop and remove containers
+#   docker compose logs -f app     # tail app logs
+# =============================================================================
+
+version: "3.9"
+
+services:
+
+  # ── Flask prediction app ───────────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    container_name: gcp-billing-app
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - FLASK_DEBUG=false
+      - PYTHONPATH=/app
+      - MLFLOW_TRACKING_URI=http://mlflow:5001
+    volumes:
+      # Mount artifacts so the container uses your locally trained model
+      # without baking model.pkl into the image
+      - ./artifacts:/app/artifacts
+      - ./logs:/app/logs
+    depends_on:
+      - mlflow
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - billing-net
+
+  # ── MLflow tracking server ─────────────────────────────────────────────────
+  mlflow:
+    image: python:3.10-slim
+    container_name: gcp-billing-mlflow
+    command: >
+      sh -c "pip install mlflow --quiet &&
+             mlflow server
+             --backend-store-uri /mlruns
+             --default-artifact-root /mlruns
+             --host 0.0.0.0
+             --port 5001"
+    ports:
+      - "5001:5001"
+    volumes:
+      # Mount your local mlruns/ so existing experiments are visible in the UI
+      - ./mlruns:/mlruns
+    networks:
+      - billing-net
+    restart: unless-stopped
+
+networks:
+  billing-net:
+    driver: bridge
