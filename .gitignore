@@ -1,2 +1,6 @@
 .DS_Store
-venv 
+venv !artifacts/.gitkeep
+venv/
+artifacts/*
+!artifacts/.gitkeep
+logs/
