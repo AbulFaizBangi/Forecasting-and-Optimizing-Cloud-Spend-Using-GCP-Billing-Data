@@ -12,7 +12,7 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, 'feature/**' ]   # run on pushes to main and any feature/* branches
   pull_request:
     branches: [ main ]
 
