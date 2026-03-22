@@ -542,10 +542,10 @@ if __name__ == "__main__":
     trainer = ModelTrainer()
     metrics, model_path = trainer.initiate_model_training()
 
-    print(f"\nTraining complete.")
+    print("\nTraining complete.")
     print(f"  Champion model  : {json.load(open('artifacts/model_report.json'))['champion_model']}")
     print(f"  Test MAPE       : {metrics['test_mape']:.2f}%")
     print(f"  Test R²         : {metrics['test_r2']:.4f}")
     print(f"  Test RMSE (INR) : {metrics['test_rmse_inr']:,.0f}")
     print(f"  Model saved     : {model_path}")
-    print(f"  MLflow UI       : mlflow ui --backend-store-uri ./mlruns")
+    print("  MLflow UI       : mlflow ui --backend-store-uri ./mlruns")

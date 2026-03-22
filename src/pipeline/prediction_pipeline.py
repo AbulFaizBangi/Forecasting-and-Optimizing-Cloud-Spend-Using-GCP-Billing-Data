@@ -355,7 +355,7 @@ if __name__ == "__main__":
     print()
 
     predicted = pipeline.predict(features)
-    print(f"Input features:")
+    print("Input features:")
     print(f"  Service     : {features.service_name}")
     print(f"  Region      : {features.region_zone}")
     print(f"  Quantity    : {features.usage_quantity} {features.usage_unit}")

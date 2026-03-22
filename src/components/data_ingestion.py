@@ -404,6 +404,6 @@ class DataIngestion:
 if __name__ == "__main__":
     ingestion = DataIngestion()
     train_path, test_path = ingestion.initiate_data_ingestion()
-    print(f"\nIngestion complete.")
+    print("\nIngestion complete.")
     print(f"  Train → {train_path}")
     print(f"  Test  → {test_path}")
