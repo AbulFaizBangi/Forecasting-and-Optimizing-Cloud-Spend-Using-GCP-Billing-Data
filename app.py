@@ -12,15 +12,12 @@ GET  /metrics   → Prometheus-compatible plaintext metrics
 GET  /api/predict → JSON API endpoint (for programmatic access)
 """
 
-import json
 import os
-import sys
 import time
 from collections import defaultdict
 
 from flask import Flask, jsonify, render_template, request
 
-from src.exception import CustomException
 from src.logger import logger
 from src.pipeline.prediction_pipeline import CustomData, PredictPipeline
 
