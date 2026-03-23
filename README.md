@@ -538,8 +538,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Abul Faiz Bangi**
 
 - GitHub: [@AbulFaizBangi](https://github.com/AbulFaizBangi)
-- LinkedIn: [Add your LinkedIn]
-- Email: [Add your email]
+- LinkedIn: https://www.linkedin.com/in/abulfaizbangi/
+- Email: abulfaizbangi@gmail.com
+- Website: [@abulfaizbangi.in](https://abulfaizbangi.in/)
 
 ---
 
