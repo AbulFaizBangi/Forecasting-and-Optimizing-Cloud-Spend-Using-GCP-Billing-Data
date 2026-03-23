@@ -461,7 +461,7 @@ if __name__ == "__main__":
     transformer = DataTransformation()
     train_arr, test_arr, preprocessor_path = transformer.initiate_data_transformation()
 
-    print(f"\nTransformation complete.")
+    print("\nTransformation complete.")
     print(f"  Train array shape : {train_arr.shape}")
     print(f"  Test array shape  : {test_arr.shape}")
     print(f"  Preprocessor      : {preprocessor_path}")
