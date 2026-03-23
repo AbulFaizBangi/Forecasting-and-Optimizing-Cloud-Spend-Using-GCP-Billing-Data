@@ -1,0 +1,409 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+
+.header { padding: 1.5rem 0 1rem; }
+.header h1 { font-size: 20px; font-weight: 500; color: var(--color-text-primary); }
+.header p { font-size: 13px; color: var(--color-text-secondary); margin-top: 4px; }
+
+.phase-nav { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.phase-btn {
+  font-size: 12px; font-weight: 500; padding: 5px 12px;
+  border-radius: 20px; border: 0.5px solid var(--color-border-secondary);
+  background: var(--color-background-secondary);
+  color: var(--color-text-secondary); cursor: pointer; transition: all .15s;
+}
+.phase-btn:hover { background: var(--color-background-primary); color: var(--color-text-primary); }
+.phase-btn.active { border: 1.5px solid; }
+.phase-btn[data-role="de"].active { background: #E6F1FB; border-color: #185FA5; color: #0C447C; }
+.phase-btn[data-role="ml"].active { background: #FAECE7; border-color: #993C1D; color: #712B13; }
+.phase-btn[data-role="mlops"].active { background: #E1F5EE; border-color: #0F6E56; color: #085041; }
+
+.phase-grid { display: flex; flex-direction: column; gap: 12px; }
+.phase-card {
+  background: var(--color-background-primary);
+  border: 0.5px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  transition: border-color .15s;
+}
+.phase-card:hover { border-color: var(--color-border-secondary); }
+.phase-card.expanded { border-color: var(--color-border-primary); }
+
+.phase-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px; cursor: pointer; user-select: none;
+}
+.phase-badge {
+  font-size: 11px; font-weight: 500; padding: 3px 10px;
+  border-radius: 12px; white-space: nowrap; flex-shrink: 0;
+}
+.badge-de   { background: #E6F1FB; color: #0C447C; }
+.badge-ml   { background: #FAECE7; color: #712B13; }
+.badge-mlops{ background: #E1F5EE; color: #085041; }
+
+.phase-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); flex: 1; }
+.phase-sub   { font-size: 12px; color: var(--color-text-secondary); }
+.phase-chevron { font-size: 10px; color: var(--color-text-tertiary); transition: transform .2s; flex-shrink: 0; }
+.phase-card.expanded .phase-chevron { transform: rotate(180deg); }
+
+.phase-body { display: none; padding: 0 16px 16px; border-top: 0.5px solid var(--color-border-tertiary); }
+.phase-card.expanded .phase-body { display: block; }
+
+.section-label { font-size: 11px; font-weight: 500; letter-spacing: .04em; color: var(--color-text-tertiary); text-transform: uppercase; margin: 14px 0 8px; }
+
+.task-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.task-item {
+  display: flex; align-items: flex-start; gap: 8px;
+  font-size: 13px; color: var(--color-text-secondary); line-height: 1.5;
+}
+.task-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+.dot-de   { background: #185FA5; }
+.dot-ml   { background: #993C1D; }
+.dot-mlops{ background: #0F6E56; }
+
+.tool-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.tool-tag {
+  font-size: 11px; font-weight: 500; padding: 2px 8px;
+  border-radius: 6px; border: 0.5px solid var(--color-border-secondary);
+  background: var(--color-background-secondary); color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+}
+
+.dataset-card {
+  background: var(--color-background-secondary);
+  border-radius: var(--border-radius-md);
+  padding: 12px;
+  margin-top: 8px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+}
+.ds-field { font-size: 12px; }
+.ds-key   { color: var(--color-text-tertiary); margin-bottom: 2px; }
+.ds-val   { color: var(--color-text-primary); font-weight: 500; }
+
+.metric-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
+.metric-card {
+  background: var(--color-background-secondary);
+  border-radius: var(--border-radius-md);
+  padding: 10px 12px; text-align: center;
+}
+.metric-card .mv { font-size: 18px; font-weight: 500; color: var(--color-text-primary); }
+.metric-card .ml { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+
+.legend { display: flex; gap: 16px; font-size: 12px; color: var(--color-text-secondary); margin-bottom: 1rem; flex-wrap: wrap; }
+.legend-item { display: flex; align-items: center; gap: 5px; }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+</style>
+
+<div class="header">
+  <h1>GCP Cloud Billing Forecasting — MLOps Project Plan</h1>
+  <p>124,275 records · 15 features · Time-series forecasting · Portfolio-grade MLOps</p>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#185FA5"></div> Data Engineer</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#993C1D"></div> ML Engineer</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#0F6E56"></div> MLOps Engineer</div>
+</div>
+
+<div class="phase-nav">
+  <button class="phase-btn active" data-role="de" onclick="filterPhase('all', this)">All Phases</button>
+  <button class="phase-btn" data-role="de" onclick="filterPhase('de', this)">Data Engineer</button>
+  <button class="phase-btn" data-role="ml" onclick="filterPhase('ml', this)">ML Engineer</button>
+  <button class="phase-btn" data-role="mlops" onclick="filterPhase('mlops', this)">MLOps Engineer</button>
+</div>
+
+<div class="phase-grid" id="phaseGrid"></div>
+
+<script>
+const phases = [
+  {
+    id: 1,
+    title: "Database Setup & Project Scaffolding",
+    sub: "Raw data stored — project skeleton, environments, folder structure",
+    role: "de",
+    badge: "Data Engineer",
+    tasks: [
+      { text: "Create GitHub repo: gcp-billing-forecasting-mlops with .gitignore, README, LICENSE" },
+      { text: "Set up Python venv (Python 3.10+), requirements.txt with pandas, scikit-learn, prophet, mlflow, great_expectations, dvc, airflow, flask" },
+      { text: "setup.py for installable package" },
+      { text: "Folder structure: src/__init__.py, configs/__init__.py, pipeline/__init__.py, logs/, artifacts/, notebooks/, utils/, custom_exception/, static/, templates/" },
+      { text: "BigQuery project setup: create dataset gcp_billing_forecasting in GCP console" },
+      { text: "GCS bucket: gs://gcp-billing-mlops-raw/ for raw CSV storage" },
+      { text: "IAM service account with BigQuery + GCS + Vertex AI roles; store JSON key in .env" },
+    ],
+    tools: ["Python 3.10", "Poetry/venv", "GitHub", "BigQuery", "GCS", "dotenv"],
+    extra: {
+      type: "dataset",
+      label: "Dataset Overview",
+      fields: [
+        { k: "Source", v: "Kaggle / sairamn19" },
+        { k: "Rows", v: "124,275" },
+        { k: "Services", v: "23 GCP services" },
+        { k: "Date range", v: "2022 (hourly)" },
+        { k: "Target", v: "Total Cost (INR)" },
+        { k: "Size", v: "~18.9 MB" },
+      ]
+    }
+  },
+  {
+    id: 2,
+    title: "ETL Data Pipeline",
+    sub: "Extract → Transform → Load into BigQuery",
+    role: "de",
+    badge: "Data Engineer",
+    tasks: [
+      { text: "Extract: Kaggle API download → GCS raw zone (gs://gcp-billing-mlops-raw/billing.csv)" },
+      { text: "Extract features: Resource_ID, Service_Name, Usage_Quantity, Usage_Unit, Region, CPU_Utilization, Memory_Utilization, Network_Inbound, Network_Outbound, Usage_Start, Usage_End, Cost_per_Qty, Unrounded_Cost, Rounded_Cost, Total_Cost_INR" },
+      { text: "Transform: Parse datetime columns (Usage_Start, Usage_End), compute duration_hours = (end - start), derive day_of_week, hour, month, is_weekend" },
+      { text: "Transform: Normalize Usage_Quantity per unit type (GB vs Hours vs Requests), one-hot encode Service_Name, Region/Zone, Usage_Unit" },
+      { text: "Transform: Aggregate daily total cost per service per region for time-series target variable" },
+      { text: "Load: Write processed parquet to BigQuery table billing_processed using pandas-gbq / BigQuery Storage Write API" },
+      { text: "Orchestration: Airflow DAG (gcp_billing_etl_dag.py) scheduling daily refresh" },
+    ],
+    tools: ["Apache Airflow", "Pandas", "pandas-gbq", "BigQuery", "GCS", "Kaggle API"],
+    extra: { type: "none" }
+  },
+  {
+    id: 3,
+    title: "Data Ingestion (Jupyter Notebook Testing)",
+    sub: "Exploratory validation, schema checks, distribution analysis",
+    role: "ml",
+    badge: "ML Engineer",
+    tasks: [
+      { text: "Load processed data from BigQuery into Jupyter; verify dtypes, nulls, duplicates" },
+      { text: "EDA: cost distribution per service (Compute Engine, Cloud Run, Cloud SQL are highest cost drivers)" },
+      { text: "Plot time-series of Total_Cost_INR aggregated daily — identify trends, seasonality, spikes" },
+      { text: "Correlation heatmap: CPU_Utilization & Memory_Utilization vs cost for each service type" },
+      { text: "Detect anomalies: IQR-based outlier flag on Unrounded_Cost, flag usage bursts in Network_Inbound" },
+      { text: "Data split strategy: train Jan–Oct 2022 (time-series aware), validate Nov 2022, test Dec 2022" },
+      { text: "Write GE (Great Expectations) suite: non-null checks, numeric bounds, date ordering constraints" },
+    ],
+    tools: ["Jupyter", "Pandas", "Matplotlib", "Seaborn", "Great Expectations", "BigQuery"],
+    extra: { type: "none" }
+  },
+  {
+    id: 4,
+    title: "Data Processing & Feature Engineering",
+    sub: "Clean, transform, engineer features for ML",
+    role: "ml",
+    badge: "ML Engineer",
+    tasks: [
+      { text: "Clean: forward-fill missing utilization values (CPU/Memory), cap Network Inbound outliers at 99th percentile" },
+      { text: "Feature Engineering: lag features (lag_1d, lag_7d, lag_30d) on daily cost per service" },
+      { text: "Feature Engineering: rolling stats (7-day rolling mean, std) on cost and usage quantity" },
+      { text: "Feature Engineering: cost_per_hour = Unrounded_Cost / duration_hours for normalised cost signal" },
+      { text: "Feature Engineering: service_region_interaction = Service_Name + '_' + Region (categorical)" },
+      { text: "Scaling: StandardScaler on numerical features (CPU%, Memory%, Network bytes); LabelEncoder on categoricals" },
+      { text: "Feature Meta: persist feature schema JSON (feature_store_schema.json) for reproducible inference" },
+      { text: "Persist final feature datasets as Parquet in GCS: gs://gcp-billing-mlops-processed/" },
+    ],
+    tools: ["Pandas", "NumPy", "Scikit-learn", "Feature-engine", "GCS"],
+    extra: { type: "none" }
+  },
+  {
+    id: 5,
+    title: "Model Training",
+    sub: "Train, tune and track forecasting models",
+    role: "ml",
+    badge: "ML Engineer",
+    tasks: [
+      { text: "Baseline: Prophet model on aggregated daily cost (handles seasonality, holidays out-of-box)" },
+      { text: "ML model: XGBoost Regressor with lag + rolling features; LightGBM for comparison" },
+      { text: "Deep learning option: LSTM / Transformer-based time-series (optional for portfolio depth)" },
+      { text: "Grid/random search hyperparameter tuning on XGBoost (n_estimators, max_depth, learning_rate, subsample)" },
+      { text: "Train/val/test split (time-series aware, no shuffle): evaluate RMSE, MAE, MAPE, R² on held-out test set" },
+      { text: "Log all runs to MLflow: params, metrics, feature importances, confusion matrices for residuals" },
+      { text: "Persist best model artifact: model.pkl + preprocessor.pkl in MLflow model registry" },
+      { text: "Merge with Experiment Tracking stage — all experiments tagged by service_name for per-service models" },
+    ],
+    tools: ["XGBoost", "LightGBM", "Prophet", "Scikit-learn", "MLflow", "Optuna"],
+    extra: {
+      type: "metrics",
+      label: "Target Model Performance",
+      metrics: [
+        { v: "< 12%", l: "MAPE target" },
+        { v: "R² > 0.88", l: "variance explained" },
+        { v: "± 5%", l: "cost forecast band" },
+      ]
+    }
+  },
+  {
+    id: 6,
+    title: "Experiment Tracking",
+    sub: "Log every run for reproducibility and comparison",
+    role: "mlops",
+    badge: "MLOps Engineer",
+    tasks: [
+      { text: "MLflow Tracking Server on GCP VM or Vertex AI Experiments — store runs in GCS backend" },
+      { text: "Log: all hyperparameters, RMSE/MAE/MAPE per run, feature importance plots as MLflow artifacts" },
+      { text: "Tag experiments: service_name, region, model_type, git_commit_sha" },
+      { text: "MLflow Model Registry: promote best model to Staging → Production with approval gate" },
+      { text: "Compare runs dashboard: filter by service, sort by MAPE ascending to identify worst-performing services" },
+      { text: "Reproducibility: seed=42 fixed, log dataset version hash, DVC pointer to exact training data" },
+    ],
+    tools: ["MLflow", "Vertex AI Experiments", "GCS", "DVC"],
+    extra: { type: "none" }
+  },
+  {
+    id: 7,
+    title: "Data & Code Versioning",
+    sub: "Track dataset revisions alongside code with DVC + Git",
+    role: "mlops",
+    badge: "MLOps Engineer",
+    tasks: [
+      { text: "DVC init in repo; add processed Parquet files to DVC tracking (dvc add data/processed/)" },
+      { text: "Remote storage: dvc remote add -d gcs gs://gcp-billing-mlops-processed/dvc-cache" },
+      { text: "Version data on each ETL run: dvc repro → creates pipeline DAG (preprocess → train → evaluate)" },
+      { text: "Code versioning: Git branch strategy — main / develop / feature/* / hotfix/*" },
+      { text: "Tag releases (v1.0.0, v1.1.0) when model is promoted to Production in MLflow Registry" },
+      { text: "PR workflow: branch → PR → code review → merge; CI runs on PR open" },
+    ],
+    tools: ["DVC", "Git", "GitHub", "GCS"],
+    extra: { type: "none" }
+  },
+  {
+    id: 8,
+    title: "User App Building",
+    sub: "Flask API + dashboard for stakeholder consumption",
+    role: "mlops",
+    badge: "MLOps Engineer",
+    tasks: [
+      { text: "Flask REST API: POST /predict — accepts JSON {service_name, region, date_range} → returns forecasted cost with confidence interval" },
+      { text: "GET /health — liveness probe for Kubernetes; GET /metrics — Prometheus-compatible" },
+      { text: "HTML dashboard (templates/): Plotly chart of cost forecast vs actuals, service breakdown table, anomaly alert banner" },
+      { text: "Streamlit alternative: interactive service picker, date range slider, cost forecast plot (faster to prototype)" },
+      { text: "FastAPI endpoint wrapper for inference with Pydantic validation (optional upgrade)" },
+      { text: "CSS + static assets in static/; mobile-responsive layout" },
+    ],
+    tools: ["Flask", "Streamlit", "Plotly", "FastAPI", "Pydantic"],
+    extra: { type: "none" }
+  },
+  {
+    id: 9,
+    title: "Training Pipeline (End-to-End Automation)",
+    sub: "Orchestrate notebooks/scripts, parameterise, ensure idempotency, schedule retraining",
+    role: "mlops",
+    badge: "MLOps Engineer",
+    tasks: [
+      { text: "Airflow DAG: billing_training_pipeline_dag — tasks: ingest → validate → preprocess → train → evaluate → register" },
+      { text: "Parameterise pipeline: YAML config (configs/training_config.yaml) with model type, hyperparams, data path — no hardcoded values" },
+      { text: "Idempotency: DVC repro checks content hashes; skip stages with no upstream changes; file checks prevent double-write" },
+      { text: "Schedule: weekly retraining trigger (Monday 02:00 IST) via Airflow; also trigger on data drift detected (see Monitoring)" },
+      { text: "Kubeflow Pipelines (optional): containerise each stage as a KFP component for GCP-native orchestration on Vertex AI" },
+      { text: "Random seeds fixed (seed=42 everywhere), feature schema validated before training starts" },
+    ],
+    tools: ["Airflow", "Kubeflow", "Vertex AI Pipelines", "DVC", "YAML", "Docker"],
+    extra: { type: "none" }
+  },
+  {
+    id: 10,
+    title: "CI/CD Deployment",
+    sub: "Code commit → automated test → build → deploy → monitor",
+    role: "de",
+    badge: "Data Engineer",
+    tasks: [
+      { text: "Code Commit: push to GitHub; PR triggers GitHub Actions workflow" },
+      { text: "CI Pipeline: pytest unit tests (data validators, feature engineering functions, API endpoints), linting (ruff/flake8), type checks (mypy), data schema validation" },
+      { text: "Model validation gate: if new model MAPE > current prod model MAPE × 1.05, block deploy" },
+      { text: "Docker: Dockerfile builds Flask + model artifact; image tagged with Git SHA and date" },
+      { text: "Push to GCR (Google Container Registry) or Artifact Registry" },
+      { text: "CD Pipeline: deploy to Cloud Run (serverless) or GKE (Kubernetes) on main branch merge" },
+      { text: "Staging environment: auto-deployed on develop merge; smoke tests run before prod promotion" },
+      { text: "Monitor post-deploy: Cloud Monitoring alerts on p99 latency > 1s and error rate > 1%" },
+    ],
+    tools: ["GitHub Actions", "Docker", "GCR", "Cloud Run", "GKE", "pytest", "ruff"],
+    extra: { type: "none" }
+  },
+  {
+    id: 11,
+    title: "ML Monitoring & Drift Detection",
+    sub: "Detect when deployed model becomes stale or inaccurate",
+    role: "mlops",
+    badge: "MLOps Engineer",
+    tasks: [
+      { text: "Data Drift: monitor input feature distributions weekly (CPU%, Memory%, Network bytes) using Evidently AI; alert if PSI > 0.2" },
+      { text: "Concept Drift: track relationship between feature inputs and cost predictions — flag if correlation degrades" },
+      { text: "Model Performance: compute MAPE weekly on last 7 days of actuals vs predictions; trigger retraining if MAPE > 15%" },
+      { text: "Prediction Quality: monitor confidence interval width; flag unexpectedly wide bands (new service pattern)" },
+      { text: "Service Health: Prometheus + Grafana dashboard — latency, throughput, error rates via /metrics endpoint" },
+      { text: "Bias & Fairness: check if model systematically under/over-forecasts specific regions or service types" },
+      { text: "Automated retraining trigger: Airflow sensor on drift alert → kicks off training pipeline DAG" },
+    ],
+    tools: ["Evidently AI", "Prometheus", "Grafana", "Cloud Monitoring", "Airflow", "Alibi Detect"],
+    extra: { type: "none" }
+  },
+];
+
+let currentFilter = 'all';
+
+function filterPhase(role, btn) {
+  currentFilter = role;
+  document.querySelectorAll('.phase-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderPhases();
+}
+
+function toggleCard(id) {
+  const card = document.getElementById('card-' + id);
+  card.classList.toggle('expanded');
+}
+
+function renderPhases() {
+  const grid = document.getElementById('phaseGrid');
+  const filtered = currentFilter === 'all' ? phases : phases.filter(p => p.role === currentFilter);
+  grid.innerHTML = filtered.map(p => {
+    const roleColor = p.role === 'de' ? 'de' : p.role === 'ml' ? 'ml' : 'mlops';
+    const dotClass = 'dot-' + roleColor;
+    return `
+      <div class="phase-card" id="card-${p.id}">
+        <div class="phase-header" onclick="toggleCard(${p.id})">
+          <div>
+            <span class="phase-badge badge-${roleColor}">${p.badge}</span>
+          </div>
+          <div style="flex:1; min-width:0;">
+            <div class="phase-title">${p.id}. ${p.title}</div>
+            <div class="phase-sub">${p.sub}</div>
+          </div>
+          <div class="phase-chevron">▼</div>
+        </div>
+        <div class="phase-body">
+          ${p.extra && p.extra.type === 'dataset' ? `
+            <div class="section-label">${p.extra.label}</div>
+            <div class="dataset-card">
+              ${p.extra.fields.map(f => `<div class="ds-field"><div class="ds-key">${f.k}</div><div class="ds-val">${f.v}</div></div>`).join('')}
+            </div>
+          ` : ''}
+          ${p.extra && p.extra.type === 'metrics' ? `
+            <div class="section-label">${p.extra.label}</div>
+            <div class="metric-row">
+              ${p.extra.metrics.map(m => `<div class="metric-card"><div class="mv">${m.v}</div><div class="ml">${m.l}</div></div>`).join('')}
+            </div>
+          ` : ''}
+          <div class="section-label">Tasks</div>
+          <ul class="task-list">
+            ${p.tasks.map(t => `
+              <li class="task-item">
+                <div class="task-dot ${dotClass}"></div>
+                <span>${t.text}</span>
+              </li>
+            `).join('')}
+          </ul>
+          <div class="section-label">Tools & Tech</div>
+          <div class="tool-tags">
+            ${p.tools.map(t => `<span class="tool-tag">${t}</span>`).join('')}
+          </div>
+          <div style="margin-top:12px;">
+            <button onclick="sendPrompt('Give me detailed implementation code for phase ${p.id}: ${p.title} of the GCP billing MLOps project')" style="font-size:12px; padding:6px 14px; border-radius:8px; border:0.5px solid var(--color-border-secondary); background:var(--color-background-secondary); color:var(--color-text-secondary); cursor:pointer;">
+              Get implementation code for this phase ↗
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+renderPhases();
+</script>
