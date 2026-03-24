@@ -20,6 +20,7 @@ This project analyzes 124,275 hourly billing records from Google Cloud Platform 
 - [Dataset](#-dataset)
 - [Installation](#-installation)
 - [Quick Start](#-quick-start)
+- [Screenshots](#-screenshots)
 - [Project Structure](#-project-structure)
 - [Pipeline Stages](#-pipeline-stages)
 - [Model Performance](#-model-performance)
@@ -212,6 +213,105 @@ curl -X POST http://localhost:5000/predict \
 ```bash
 pytest tests/ -v --cov=src
 ```
+
+---
+
+## 📸 Screenshots
+
+### Training Pipeline Execution
+
+Run the complete training pipeline with data ingestion, feature engineering, and model training:
+
+```bash
+python src/pipeline/training_pipeline.py
+```
+
+![Training Pipeline](screenshots/training_pipeline.png)
+
+*The training pipeline executes all stages: data ingestion → validation → transformation → model training with Optuna hyperparameter tuning.*
+
+---
+
+### MLflow Experiment Tracking
+
+View all experiments, compare models, and analyze metrics:
+
+```bash
+mlflow ui --backend-store-uri ./mlruns
+```
+
+![MLflow UI](screenshots/mlflow_ui.png)
+
+*MLflow dashboard showing XGBoost and LightGBM experiments with MAPE, R², RMSE metrics, and feature importance artifacts.*
+
+---
+
+### Flask Web Application
+
+Start the Flask API server:
+
+```bash
+python app.py
+```
+
+![Flask Application](screenshots/flask_app.png)
+
+*Interactive web interface for cloud cost predictions with service selection and input forms.*
+
+---
+
+### Prediction Examples
+
+#### Compute Engine Cost Forecast
+
+Input parameters for Compute Engine service:
+
+![Compute Engine Input](screenshots/compute_engine_input.png)
+
+*Input form with service name, region, usage quantity, CPU/Memory utilization, and network data.*
+
+**Forecasted Result:**
+
+![Compute Engine Result](screenshots/compute_engine_result.png)
+
+*Predicted cost in INR with model confidence and timestamp.*
+
+---
+
+#### Cloud Storage Cost Forecast
+
+Input parameters for Cloud Storage service:
+
+![Cloud Storage Input](screenshots/cloud_storage_input.png)
+
+*Input form configured for Cloud Storage billing prediction.*
+
+**Forecasted Result:**
+
+![Cloud Storage Result](screenshots/cloud_storage_result.png)
+
+*Predicted storage cost with breakdown and model metadata.*
+
+---
+
+### How to Add Your Screenshots
+
+1. Take screenshots of your running application
+2. Save them in the `screenshots/` directory with these names:
+   - `training_pipeline.png` — Training pipeline execution
+   - `mlflow_ui.png` — MLflow experiment dashboard
+   - `flask_app.png` — Flask web application home page
+   - `compute_engine_input.png` — Compute Engine input form
+   - `compute_engine_result.png` — Compute Engine prediction result
+   - `cloud_storage_input.png` — Cloud Storage input form
+   - `cloud_storage_result.png` — Cloud Storage prediction result
+
+3. Commit and push to GitHub:
+   ```bash
+   git add screenshots/
+   git commit -m "Add project screenshots"
+   git push origin main
+   ```
 
 ---
 
